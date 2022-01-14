@@ -151,7 +151,64 @@ w reporter-config.json
     "cypress:e2e": "start-test start http-get://localhost:4200 cypress:run; npm run junit:merge; npm run mochawesome:merge"
   },
   
-  
+ 
+ DOCKER
+ 
+ https://docs.cypress.io/examples/examples/docker
+ 
+ utworzyc DockerFile
+ 
+ FROM cypress/base:10.18.0
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY . /app
+
+RUN npm install --save-dev cypress
+
+RUN $(npm bin)/cypress verify
+
+RUN $(npm bin)/cypress run
+
+RUN ["npm", "run", "cypress:run"]
+
+utworzyc .dockerignore i dodać niepotrzebne do kopiowania foldery jak np node_modules
+
+`docker build -t cypress .`
+
+
+ dodac docker-compose.yml aby miec dostep do wynikow poniewaz wszytsko sie tworzy w docker container
+ 
+ version: '3.7'
+ services:
+  e2e:
+    image: cypress_compose
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./dockerReports:/app/cypress/results
+      - ./dockerReports:/app/mochawesome-report
+      
+ 
+ OKTA LOGIN
+ 
+ https://gist.github.com/ndavis/2c84ab40aaa3c98c3a8062bdb3938232
+ 
+ odpalanie cross browsers:
+ 
+     "cy:run_browser": "npx cypress run --browser firefox --headless & npx cypress run --browser chrome --headless"
+
+Dashboard
+
+Trzeba sie zalogowac w oknie npx cypress open  do uruchomienia trzeba dodac klucz aby wszytsko bylo wysylane do dashboard
+https://www.cypress.io/dashboard/
+
+grupowanie wynikow na np przegladarki poprzez flage `--group nazwa_grupy` to jest rowniez puszczanie in parallel na jednej maszynie ale zeby puszczac na roznych trzeba uzyc flagi --parallel
+
+ 
+ 
   PRZYKŁADY CYPRESS https://github.com/cypress-io/cypress-example-recipes
   
   live chat cypress gitter.im/cypress-io-cypress
